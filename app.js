@@ -19,22 +19,25 @@ app.enable('trust proxy');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.options('*', cors());
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'", 'data:', 'blob:', 'https:', 'ws:'],
-      connectSrc: ["'self'"],
-      frameSrc: ["'self'"],
-      childSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
-      fontSrc: ["'self'"],
-      imgSrc: ["'self'"],
-      baseUri: ["'self'"],
-    },
-  })
-);
+//script
+
+app.use(express.static(path.join(__dirname, 'client', 'build')));
+
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'", 'data:', 'blob:', 'https:', 'ws:'],
+//       connectSrc: ["'self'"],
+//       frameSrc: ["'self'"],
+//       childSrc: ["'self'"],
+//       scriptSrc: ["'self'"],
+//       styleSrc: ["'self'"],
+//       fontSrc: ["'self'"],
+//       imgSrc: ["'self'"],
+//       baseUri: ["'self'"],
+//     },
+//   })
+// );
 
 app.use(compression());
 /////////////////////////////////////////
@@ -45,12 +48,22 @@ app.use('/bookapi/v1/users', userRoute);
 app.use('/bookapi/v1/bookings', bookingRoute);
 app.use('/bookapi/v1/reviews', reviewRoute);
 
-app.all('*', (req, res, next) => {
-  return res.status(404).json({
-    status: 'fail',
-    message: '此路徑不存在！',
-  });
-});
+// app.all('*', (req, res, next) => {
+//   return res.status(404).json({
+//     status: 'fail',
+//     message: '此路徑不存在！',
+//   });
+// });
 app.use(errorController);
+
+//script
+if (
+  process.env.NODE_ENV === 'production' ||
+  process.env.NODE_ENV === 'staging'
+) {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
+  });
+}
 /////////////////////////////////////////
 module.exports = app;

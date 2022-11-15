@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3030/bookapi/v1/users';
+const API_URL = 'https://book-market-practice.herokuapp.com/bookapi/v1/users';
 
 class UserService {
   updateUserData(id, data) {
